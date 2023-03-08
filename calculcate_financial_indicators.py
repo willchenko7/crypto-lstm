@@ -33,3 +33,9 @@ def calculate_financial_indicators(file_path):
     #drop the rows with NaN values
     df = df.dropna()
     return df
+
+if __name__ == '__main__':
+    #calculate the financial indicators
+    df = calculate_financial_indicators('data/BTC-USD_hour.csv')
+    #save the dataframe as a csv file
+    df.to_csv('data/BTC-USD_hour_financial_indicators.csv', index=False)

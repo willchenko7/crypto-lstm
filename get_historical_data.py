@@ -65,8 +65,14 @@ def get_historical_data(symbol, frequency, length):
     df = pd.DataFrame(data, columns=["time", "low", "high", "open", "close", "volume"])
     df["time"] = pd.to_datetime(df["time"], unit="s")
     filename = f"{symbol}_{frequency}.csv"
-    df.to_csv(os.path.join(os.getcwd(),'data',filename), index=False)
-    return
+    return df
 
-# Get the historical data for Bitcoin
-get_historical_data("BTC-USD", "hour", 10000)
+if __name__ == "__main__":
+    #define inputs
+    symbol = "BTC-USD"
+    frequency = "hour"
+    length = 10000
+    # Get the historical data for coin
+    get_historical_data(symbol, frequency, length)
+    filename = f"{symbol}_{frequency}.csv"
+    df.to_csv(os.path.join(os.getcwd(),'data',filename), index=False)
