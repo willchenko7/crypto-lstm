@@ -1,0 +1,46 @@
+import pandas as pd
+import numpy as np
+
+def train_test_split(data, train_percentage=0.8,n_steps=30):
+    '''
+    Goal: Generic function to split a pandas dataframe 
+        into training and testing sets
+
+    Input:
+        data: pandas df
+        train_percentage: what percentage of the data should be used for training
+            default: 0.8
+        n_steps: number of time steps to use for the LSTM model
+            default: 30
+        
+    Output:
+        train_data: pandas df containing the training data
+        test_data: pandas df containing the testing data
+        X_train: numpy array containing the training data
+        y_train: numpy array containing the training labels
+        X_test: numpy array containing the testing data
+        y_test: numpy array containing the testing labels
+    '''
+    # Split the data into training and testing sets
+    train_size = int(len(data) * 0.8)
+    train_data = data.iloc[:train_size]
+    test_data = data.iloc[train_size:]
+    # Scale the data using MinMaxScaler
+    scaler = MinMaxScaler()
+    train_scaled = scaler.fit_transform(train_data)
+    test_scaled = scaler.transform(test_dat)
+    # Create the training data
+    X_train = []
+    y_train = []
+    for i in range(n_steps, len(train_scaled)):
+        X_train.append(train_scaled[i-n_steps:i])
+        y_train.append(train_scaled[i, 0])
+    X_train, y_train = np.array(X_train), np.array(y_train)
+    # Create the testing data
+    X_test = []
+    y_test = []
+    for i in range(n_steps, len(test_scaled)):
+        X_test.append(test_scaled[i-n_steps:i])
+        y_test.append(test_scaled[i, 0])
+    X_test, y_test = np.array(X_test), np.array(y_test)
+    return train_data, test_data, X_train, y_train, X_test, y_test
