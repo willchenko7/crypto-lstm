@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+from sklearn.preprocessing import MinMaxScaler
+
 
 def train_test_split(data, train_percentage=0.8,n_steps=30):
     '''
@@ -20,7 +22,10 @@ def train_test_split(data, train_percentage=0.8,n_steps=30):
         y_train: numpy array containing the training labels
         X_test: numpy array containing the testing data
         y_test: numpy array containing the testing labels
+        scaler: sklearn MinMaxScaler object used to scale the data, used for inverse scaling later
     '''
+    #remove nan, inf, -inf from data
+    data =data[~data.isin([np.nan, np.inf, -np.inf]).any(1)]
     # Split the data into training and testing sets
     train_size = int(len(data) * 0.8)
     train_data = data.iloc[:train_size]
@@ -28,7 +33,7 @@ def train_test_split(data, train_percentage=0.8,n_steps=30):
     # Scale the data using MinMaxScaler
     scaler = MinMaxScaler()
     train_scaled = scaler.fit_transform(train_data)
-    test_scaled = scaler.transform(test_dat)
+    test_scaled = scaler.transform(test_data)
     # Create the training data
     X_train = []
     y_train = []
@@ -43,4 +48,4 @@ def train_test_split(data, train_percentage=0.8,n_steps=30):
         X_test.append(test_scaled[i-n_steps:i])
         y_test.append(test_scaled[i, 0])
     X_test, y_test = np.array(X_test), np.array(y_test)
-    return train_data, test_data, X_train, y_train, X_test, y_test
+    return train_data, test_data, X_train, y_train, X_test, y_test, scaler
