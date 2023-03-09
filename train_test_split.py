@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
+import pickle
 
 
 def train_test_split(data, train_percentage=0.8,n_steps=30):
@@ -49,3 +50,17 @@ def train_test_split(data, train_percentage=0.8,n_steps=30):
         y_test.append(test_scaled[i, 0])
     X_test, y_test = np.array(X_test), np.array(y_test)
     return train_data, test_data, X_train, y_train, X_test, y_test, scaler
+
+if __name__ == '__main__':
+    symbol = 'BTC-USD'
+    frequency = 'hour'
+    n_steps = 30
+    #load historical data
+    data = pd.read_csv(f'data/{symbol}_{frequency}_financial_indicators.csv')
+    data = data[['close', 'fisher', 'macd', 'sma', 'wma']]
+    #train test split
+    train_data, test_data, X_train, y_train, X_test, y_test, scaler = \
+        train_test_split(data,train_percentage=0.8, n_steps=n_steps)
+    #save the scaler as a pickle file
+    with open(f'data/{symbol}_{n_steps}_scaler.pkl', 'wb') as f:
+        pickle.dump(scaler, f)
