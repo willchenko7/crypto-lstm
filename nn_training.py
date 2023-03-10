@@ -11,7 +11,7 @@ indicators = ['close', 'fisher', 'macd', 'sma', 'wma']
 data_frequency = 'hour'
 # Define hyperparameters
 n_steps = 30
-n_epochs = 50
+n_epochs = 500
 n_batch_size = 32
 n_features = len(indicators)
 train_percentage = 0.8
@@ -21,7 +21,7 @@ data = pd.read_csv(f'data/{symbol}_{data_frequency}_financial_indicators.csv')
 #select a subset of the columns of data based on indicators
 data = data[indicators]
 #create model name
-model_name = f'{symbol}_{n_steps}_{n_features}'
+model_name = f'{symbol}_{n_steps}_{n_features}_{n_epochs}'
 
 #split into training and testing sets
 train_data, test_data, X_train, y_train, X_test, y_test, scaler = \
