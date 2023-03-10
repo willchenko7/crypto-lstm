@@ -11,7 +11,7 @@ from datetime import datetime
 import matplotlib.dates as mdates
 
 
-def get_previous_predicted_prices(symbol,data_frequency,indicators,model,scaler,n_steps,n_features):
+def get_previous_predicted_prices(symbol,data_frequency,indicators,model,scaler,n_steps,n_features,num_predictions=24):
     '''
     Goal: Return an array of the predicted price at each point in the last 300 hours
          It will also return the actual price at each point in the last 300 hours
@@ -32,6 +32,9 @@ def get_previous_predicted_prices(symbol,data_frequency,indicators,model,scaler,
             The number of steps to be used in the model
         n_features: int
             The number of features to be used in the model
+        num_predictions: int
+            The number of predictions to be made
+            max=300-12-1=287
         
     Output:
         predicted_prices: numpy array
@@ -39,22 +42,22 @@ def get_previous_predicted_prices(symbol,data_frequency,indicators,model,scaler,
         actual_prices: numpy array
             An array of the actual price at each point in the last 300 hours
     '''
-    #load historical data
-    data = pd.read_csv(f'data/{symbol}_{data_frequency}_financial_indicators.csv')
+    #load live data
+    data = pd.read_csv(f'data/{symbol}_{data_frequency}_live_financial_indicators.csv')
     #save the time column
     times_df = data['time']
     data = data[indicators]
     #order this data  by date in descending order
     #data = data.sort_values(by='date', ascending=False)
     #get a subset of this data, get the latest 1000 rows
-    data = data.iloc[:1000]
-    times_df = times_df.iloc[:1000]
+    #data = data.iloc[:1000]
+    #times_df = times_df.iloc[:1000]
     #start at the 300th row, and get the previous n_steps rows as a subset of data
     #loop through the remainder of the data, so from 300 to the latest available row
     predicted_prices = []
     actual_prices = []
     times = []
-    for i in range(300,0,-1):
+    for i in range(num_predictions,0,-1):
         print(f'Predicting price for row {i}')
         #get the previous n_steps rows
         data_subset = data.iloc[i:i+n_steps]
@@ -99,13 +102,10 @@ if __name__ == '__main__':
     data_frequency = 'hour'
     #define hyperparameters
     n_steps = 30
-    n_epochs = 1000
+    n_epochs = 500
     n_batch_size = 32
     n_features = len(indicators)
     train_percentage = 0.8
-    #train test split
-    data = pd.read_csv(f'data/{symbol}_{data_frequency}_financial_indicators.csv')
-    data = data[indicators]
     #load scaler
     with open(f'data/{symbol}_{n_steps}_scaler.pkl', 'rb') as f:
         scaler = pickle.load(f)
