@@ -43,12 +43,17 @@ def get_previous_predicted_prices(symbol,data_frequency,indicators,model,scaler,
             An array of the actual price at each point in the last 300 hours
     '''
     #load live data
-    data = pd.read_csv(f'data/{symbol}_{data_frequency}_live_financial_indicators.csv')
+    #data = pd.read_csv(f'data/{symbol}_{data_frequency}_live_financial_indicators.csv')
+
+    #load historical data
+    data = pd.read_csv(f'data/{symbol}_{data_frequency}_financial_indicators.csv')
+    #get all rows before march 6 2023
+    data = data[data['time'] < '2023-03-06 18:00:00']
     #save the time column
     times_df = data['time']
     data = data[indicators]
     #order this data  by date in descending order
-    #data = data.sort_values(by='date', ascending=False)
+    #data = data.sort_values(by='time', ascending=False)
     #get a subset of this data, get the latest 1000 rows
     #data = data.iloc[:1000]
     #times_df = times_df.iloc[:1000]
@@ -76,7 +81,7 @@ def get_previous_predicted_prices(symbol,data_frequency,indicators,model,scaler,
         times.append(times_df.iloc[i])
     return predicted_prices, actual_prices, times
 
-def plot_actual_vs_predicted(predicted_prices,acutal_prices,times,model_name):
+def plot_actual_vs_predicted(predicted_prices,acutal_prices,times,model_name,plot_title_append=''):
     x = [datetime.strptime(date, '%Y-%m-%d %H:%M:%S') for date in times]
     plt.plot(x, predicted_prices, label='Predicted Price')
     plt.plot(x, actual_prices, label='Actual Price')
@@ -91,7 +96,7 @@ def plot_actual_vs_predicted(predicted_prices,acutal_prices,times,model_name):
     plt.legend()
     #plt.xticks(x, [date.strftime('%m-%d %H') for date in x], rotation=45, ha='right')
     #save fig
-    plt.savefig(f'graphs/{model_name}_predicted_prices.png')
+    plt.savefig(f'graphs/{model_name}_predicted_prices{plot_title_append}.png')
     return
 
 
@@ -110,13 +115,15 @@ if __name__ == '__main__':
     with open(f'data/{symbol}_{n_steps}_scaler.pkl', 'rb') as f:
         scaler = pickle.load(f)
     #load saved model
-    model_name = f'{symbol}_{n_steps}_{n_features}_{n_epochs}'
+    #model_name = f'{symbol}_{n_steps}_{n_features}_{n_epochs}'
+    model_name = f'{symbol}_{n_steps}_{n_epochs}_{n_batch_size}_{train_percentage}'
+    #model_name = 'BTC-USD_30_5_1000'
     model = tf.keras.models.load_model(f'models/{model_name}.h5')
     #get predicted prices
     predicted_prices,actual_prices,times = \
-        get_previous_predicted_prices(symbol,data_frequency,indicators,model,scaler,n_steps,n_features)
+        get_previous_predicted_prices(symbol,data_frequency,indicators,model,scaler,n_steps,n_features,num_predictions=1000)
     print(predicted_prices)
     print(actual_prices)
     print(times)
     #plot actual vs predicted
-    plot_actual_vs_predicted(predicted_prices,actual_prices,times,model_name)
+    plot_actual_vs_predicted(predicted_prices,actual_prices,times,model_name,plot_title_append='-1')
